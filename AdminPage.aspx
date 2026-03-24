@@ -82,6 +82,9 @@ background:#7f1d1d !important;
 background:#991b1b !important;
 }
 
+background:#991b1b !important;
+}
+
 </style>
 
 </head>
@@ -102,6 +105,7 @@ background:#991b1b !important;
 
 
 <div class="card">
+<div class="card">
 
 <h2>Admin Controls</h2>
 
@@ -111,9 +115,9 @@ background:#991b1b !important;
 Text="Manage Users"
 OnClick="btnManageUsers_Click" />
 
-<asp:Button ID="btnManageRoles" runat="server"
-Text="Manage Roles"
-OnClick="btnManageRoles_Click" />
+<asp:Button ID="btnCreateUsers" runat="server"
+Text="Create Users"
+OnClick="btnCreateUsers_Click" />
 
 <asp:Button ID="btnViewReports" runat="server"
 Text="View Reports"
@@ -122,6 +126,10 @@ OnClick="btnViewReports_Click" />
 <asp:Button ID="btnAuditLogs" runat="server"
 Text="Audit Logs"
 OnClick="btnAuditLogs_Click" />
+
+<asp:Button ID="btnTeachingDashboard" runat="server"
+Text="Teaching Dashboard"
+OnClick="btnTeachingDashboard_Click" />
 
 <asp:Button ID="btnLogoutAdmin" runat="server"
 Text="Logout"

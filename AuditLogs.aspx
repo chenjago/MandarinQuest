@@ -9,32 +9,62 @@
 <style>
 
 body{
-font-family:'Segoe UI';
-background:#f9fafb;
-padding:40px;
+    font-family:'Segoe UI';
+    background:#f9fafb;
+    padding:40px;
 }
 
 .container{
-max-width:800px;
-margin:auto;
+    max-width:900px;
+    margin:auto;
 }
 
 h1{
-text-align:center;
-color:#b91c1c;
-margin-bottom:25px;
+    text-align:center;
+    color:#b91c1c;
+    margin-bottom:25px;
 }
 
 .card{
-background:white;
-padding:25px;
-border-radius:10px;
-box-shadow:0 4px 10px rgba(0,0,0,0.08);
+    background:white;
+    padding:25px;
+    border-radius:10px;
+    box-shadow:0 4px 10px rgba(0,0,0,0.08);
+    overflow-x:auto;
 }
 
-.log{
-padding:10px;
-border-bottom:1px solid #eee;
+/* TABLE STYLE */
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th{
+    background:#b91c1c;
+    color:white;
+    padding:10px;
+    text-align:left;
+}
+
+td{
+    padding:10px;
+    border-bottom:1px solid #eee;
+    word-wrap:break-word;
+}
+
+/* BUTTON */
+.btn{
+    padding:6px 12px;
+    border:none;
+    border-radius:6px;
+    background:#dc2626;
+    color:white;
+    cursor:pointer;
+    margin-bottom:15px;
+}
+
+.btn:hover{
+    background:#b91c1c;
 }
 
 </style>
@@ -49,9 +79,37 @@ border-bottom:1px solid #eee;
 
 <h1>Audit Logs</h1>
 
+<asp:Button ID="btnBack" runat="server"
+Text="← Back to Admin"
+CssClass="btn"
+OnClick="btnBack_Click" />
+
 <div class="card">
 
-<asp:Literal ID="litLogs" runat="server"></asp:Literal>
+<asp:GridView
+ID="gvAuditLogs"
+runat="server"
+AutoGenerateColumns="False"
+AllowPaging="True"
+PageSize="20"
+OnPageIndexChanging="gvAuditLogs_PageIndexChanging"
+OnRowDataBound="gvAuditLogs_RowDataBound">
+
+<Columns>
+
+    <asp:BoundField DataField="UserID" HeaderText="User ID" />
+
+    <asp:BoundField DataField="Action" HeaderText="Action" />
+
+    <asp:BoundField DataField="Description" HeaderText="Description" />
+
+    <asp:BoundField DataField="LogDate"
+        HeaderText="Date & Time"
+        DataFormatString="{0:yyyy-MM-dd HH:mm}" />
+
+</Columns>
+
+</asp:GridView>
 
 </div>
 

@@ -6,27 +6,43 @@ namespace MandarinQuest
 {
     public partial class TeacherPage : System.Web.UI.Page
     {
-
         SqlConnection con = new SqlConnection(
-        @"Data Source=(LocalDB)\MSSQLLocalDB;
-        AttachDbFilename=|DataDirectory|\MandarinQuest.mdf;
-        Integrated Security=True");
+            @"Data Source=(LocalDB)\MSSQLLocalDB;
+            AttachDbFilename=|DataDirectory|\MandarinQuest.mdf;
+            Integrated Security=True");
 
         protected void Page_Load(object sender, EventArgs e)
         {
-
-            if (Session["UserID"] == null || Session["Role"] == null || Session["Role"].ToString() != "teacher")
+            if (Session["UserID"] == null || Session["Role"] == null)
             {
                 Response.Redirect("Login.aspx");
+                return;
+            }
+
+            string role = Session["Role"].ToString().ToLower();
+
+            if (role != "teacher" && role != "admin")
+            {
+                Response.Redirect("Login.aspx");
+                return;
             }
 
             if (!IsPostBack)
             {
-                lblWelcomeTeacher.Text = Session["UserID"].ToString();
+                if (role == "admin")
+                {
+                    lblWelcomeTeacher.Text = Session["FromAdmin"] != null
+                        ? "Admin (Preview Mode)"
+                        : "Admin (Viewing Teaching Dashboard)";
+                }
+                else
+                {
+                    lblWelcomeTeacher.Text = "Teacher ID: " + Session["UserID"].ToString();
+                }
+
                 LoadStats();
                 LoadUpcomingSessions();
             }
-
         }
 
         void LoadStats()
@@ -46,6 +62,10 @@ namespace MandarinQuest
                 INNER JOIN Roles R ON UR.RoleID = R.RoleID
                 WHERE R.RoleName = 'student'
             ", con);
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/sean
             lblStudentCount.Text = cmd3.ExecuteScalar().ToString();
 
             con.Close();
@@ -53,17 +73,16 @@ namespace MandarinQuest
 
         void LoadUpcomingSessions()
         {
-
             SqlDataAdapter da = new SqlDataAdapter(
                 @"SELECT 
-                L.LevelName,
-                CS.SessionTitle,
-                CS.SessionDate,
-                CS.SessionLink
-                FROM ClassSessions CS
-                JOIN Levels L ON CS.LevelID = L.LevelID
-                WHERE CAST(CS.SessionDate AS DATETIME) >= DATEADD(HOUR,-3, GETDATE())
-                ORDER BY CS.SessionDate",
+                    L.LevelName,
+                    CS.SessionTitle,
+                    CS.SessionDate,
+                    CS.SessionLink
+                  FROM ClassSessions CS
+                  JOIN Levels L ON CS.LevelID = L.LevelID
+                  WHERE CAST(CS.SessionDate AS DATETIME) >= DATEADD(HOUR,-3, GETDATE())
+                  ORDER BY CS.SessionDate",
                 con);
 
             DataTable dt = new DataTable();
@@ -71,7 +90,6 @@ namespace MandarinQuest
 
             rptSessions.DataSource = dt;
             rptSessions.DataBind();
-
         }
 
         protected void btnManageLevels_Click(object sender, EventArgs e)
@@ -96,10 +114,19 @@ namespace MandarinQuest
 
         protected void btnLogoutInstructor_Click(object sender, EventArgs e)
         {
-            Session.Clear();
-            Session.Abandon();
-            Response.Redirect("GuestPage.aspx");
+            // If admin came from AdminPage, go back there
+            if (Session["Role"] != null && Session["Role"].ToString().ToLower() == "admin"
+                && Session["FromAdmin"] != null)
+            {
+                Session.Remove("FromAdmin");
+                Response.Redirect("AdminPage.aspx");
+            }
+            else
+            {
+                Session.Clear();
+                Session.Abandon();
+                Response.Redirect("GuestPage.aspx");
+            }
         }
-
     }
 }

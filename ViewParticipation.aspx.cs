@@ -15,10 +15,17 @@ namespace MandarinQuest
 
         protected void Page_Load(object sender, EventArgs e)
         {
+<<<<<<< HEAD
             if (Session["Role"] == null || Session["Role"].ToString() != "teacher")
             {
                 Response.Redirect("Login.aspx");
                 return;
+=======
+
+            if (Session["Role"] == null || (Session["Role"].ToString() != "teacher" && Session["Role"].ToString() != "admin"))
+            {
+                Response.Redirect("Login.aspx");
+>>>>>>> origin/sean
             }
 
             if (!IsPostBack)
