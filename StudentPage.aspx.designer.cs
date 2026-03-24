@@ -96,6 +96,15 @@ namespace MandarinQuest
         protected global::System.Web.UI.WebControls.Literal litChatHistory;
 
         /// <summary>
+        /// pnlWelcome control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel pnlWelcome;
+
+        /// <summary>
         /// txtQuestion control.
         /// </summary>
         /// <remarks>

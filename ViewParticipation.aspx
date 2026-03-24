@@ -1,167 +1,323 @@
 ﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="ViewParticipation.aspx.cs" Inherits="MandarinQuest.ViewParticipation" %>
 
 <!DOCTYPE html>
-
 <html xmlns="http://www.w3.org/1999/xhtml">
-
 <head runat="server">
-<title>Participation</title>
+    <title>Participation</title>
+    <style>
+        body{
+            margin:0;
+            font-family:'Segoe UI';
+            background:#f6f6f6;
+        }
 
-<style>
+        .navbar{
+            background:#b30000;
+            padding:15px;
+            text-align:center;
+        }
 
-body{
-margin:0;
-font-family:'Segoe UI';
-background:#f6f6f6;
-}
+        .navbar a{
+            color:white;
+            margin:0 15px;
+            text-decoration:none;
+            font-weight:bold;
+        }
 
-/* NAVBAR */
+        .navbar a:hover{
+            text-decoration:underline;
+        }
 
-.navbar{
-background:#b30000;
-padding:15px;
-text-align:center;
-}
+        .header{
+            font-size:34px;
+            font-weight:700;
+            color:#b30000;
+            text-align:center;
+            margin-top:30px;
+        }
 
-.navbar a{
-color:white;
-margin:0 15px;
-text-decoration:none;
-font-weight:bold;
-}
+        .subheader{
+            text-align:center;
+            color:#666;
+            margin-top:8px;
+            margin-bottom:20px;
+        }
 
-.navbar a:hover{
-text-decoration:underline;
-}
+        .container{
+            width:1120px;
+            margin:auto;
+            padding:30px;
+        }
 
-/* HEADER */
+        .section{
+            background:white;
+            padding:22px;
+            border-radius:12px;
+            box-shadow:0 4px 12px rgba(0,0,0,0.10);
+            margin-bottom:28px;
+        }
 
-.header{
-font-size:28px;
-font-weight:bold;
-color:#b30000;
-text-align:center;
-margin-top:30px;
-}
+        .section h3{
+            margin-top:0;
+            margin-bottom:18px;
+            color:#111;
+            font-size:18px;
+        }
 
-/* CONTAINER */
+        .summary-grid{
+            display:grid;
+            grid-template-columns:repeat(4, 1fr);
+            gap:18px;
+        }
 
-.container{
-width:1000px;
-margin:auto;
-padding:30px;
-}
+        .summary-card{
+            background:linear-gradient(180deg, #fff, #fff8f8);
+            border:1px solid #f0d1d1;
+            border-radius:12px;
+            padding:18px;
+        }
 
-/* FILTER SECTION */
+        .summary-label{
+            color:#777;
+            font-size:14px;
+            margin-bottom:8px;
+        }
 
-.section{
-background:white;
-padding:20px;
-border-radius:10px;
-box-shadow:0 4px 8px rgba(0,0,0,0.1);
-margin-bottom:30px;
-}
+        .summary-value{
+            color:#b30000;
+            font-size:28px;
+            font-weight:700;
+        }
 
-/* INPUT */
+        .filter-grid{
+            display:grid;
+            grid-template-columns:1fr 1fr 1fr 1.2fr auto auto;
+            gap:14px;
+            align-items:end;
+        }
 
-select{
-width:100%;
-padding:8px;
-margin-top:5px;
-margin-bottom:10px;
-}
+        .field-label{
+            font-weight:600;
+            display:block;
+            margin-bottom:6px;
+        }
 
-/* TABLE */
+        select, input[type=text]{
+            width:100%;
+            padding:10px;
+            border:1px solid #ccc;
+            border-radius:6px;
+            box-sizing:border-box;
+            font-family:'Segoe UI';
+        }
 
-.grid{
-width:100%;
-border-collapse:collapse;
-}
+        .btn{
+            background:#b30000;
+            color:white;
+            border:none;
+            padding:10px 16px;
+            border-radius:6px;
+            cursor:pointer;
+            font-weight:600;
+            min-width:100px;
+        }
 
-.grid th{
-background:#b30000;
-color:white;
-padding:10px;
-}
+        .btn:hover{
+            background:#d40000;
+        }
 
-.grid td{
-padding:10px;
-border-bottom:1px solid #ddd;
-}
+        .btn-secondary{
+            background:#666;
+        }
 
-</style>
+        .btn-secondary:hover{
+            background:#444;
+        }
 
+        .grid{
+            width:100%;
+            border-collapse:collapse;
+        }
+
+        .grid th{
+            background:#b30000;
+            color:white;
+            padding:12px 10px;
+            text-align:left;
+        }
+
+        .grid td{
+            padding:12px 10px;
+            border-bottom:1px solid #ddd;
+            vertical-align:middle;
+        }
+
+        .grid tr:nth-child(even) td{
+            background:#fcfcfc;
+        }
+
+        .status-badge{
+            display:inline-block;
+            padding:6px 12px;
+            border-radius:16px;
+            font-size:12px;
+            font-weight:700;
+            color:white;
+        }
+
+        .status-completed{
+            background:#2e7d32;
+        }
+
+        .status-inprogress{
+            background:#ef6c00;
+        }
+
+        .status-notstarted{
+            background:#757575;
+        }
+
+        .status-other{
+            background:#1565c0;
+        }
+
+        .empty-box{
+            margin-top:14px;
+            color:#888;
+            font-style:italic;
+        }
+    </style>
 </head>
-
 <body>
+    <form id="form1" runat="server">
 
-<form id="form1" runat="server">
+        <div class="navbar">
+            <a href="TeacherPage.aspx">Dashboard</a>
+            <a href="ManageLevels.aspx">Manage Levels</a>
+            <a href="ManageLessons.aspx">Manage Lessons</a>
+            <a href="UploadMaterials.aspx">Upload Materials</a>
+            <a href="ScheduleSessions.aspx">Schedule Session</a>
+            <a href="ViewParticipation.aspx">Participation</a>
+        </div>
 
-<!-- NAVBAR -->
+        <div class="container">
 
-<div class="navbar">
+            <div class="header">Student Participation</div>
+            <div class="subheader">Track participation by level, lesson, student, and completion status</div>
 
-<a href="TeacherPage.aspx">Dashboard</a> <a href="ManageLevels.aspx">Manage Levels</a> <a href="ManageLessons.aspx">Manage Lessons</a> <a href="UploadMaterials.aspx">Upload Materials</a> <a href="ScheduleSessions.aspx">Schedule Session</a> <a href="ViewParticipation.aspx">Participation</a>
+            <div class="section">
+                <h3>Overview</h3>
 
-</div>
+                <div class="summary-grid">
+                    <div class="summary-card">
+                        <div class="summary-label">Total Records</div>
+                        <asp:Label ID="lblTotalRecords" runat="server" CssClass="summary-value" Text="0"></asp:Label>
+                    </div>
 
-<div class="container">
+                    <div class="summary-card">
+                        <div class="summary-label">Unique Students</div>
+                        <asp:Label ID="lblTotalStudents" runat="server" CssClass="summary-value" Text="0"></asp:Label>
+                    </div>
 
-<div class="header">
-Student Participation
-</div>
+                    <div class="summary-card">
+                        <div class="summary-label">Completed Records</div>
+                        <asp:Label ID="lblCompletedRecords" runat="server" CssClass="summary-value" Text="0"></asp:Label>
+                    </div>
 
-<div class="section">
+                    <div class="summary-card">
+                        <div class="summary-label">Completion Rate</div>
+                        <asp:Label ID="lblCompletionRate" runat="server" CssClass="summary-value" Text="0%"></asp:Label>
+                    </div>
+                </div>
+            </div>
 
-<h3>Filter</h3>
+            <div class="section">
+                <h3>Filter</h3>
 
-Level
+                <div class="filter-grid">
+                    <div>
+                        <label class="field-label">Level</label>
+                        <asp:DropDownList
+                            ID="ddlLevels"
+                            runat="server"
+                            AutoPostBack="true"
+                            OnSelectedIndexChanged="ddlLevels_SelectedIndexChanged">
+                        </asp:DropDownList>
+                    </div>
 
-<asp:DropDownList
-ID="ddlLevels"
-runat="server"
-AutoPostBack="true"
-OnSelectedIndexChanged="ddlLevels_SelectedIndexChanged">
-</asp:DropDownList>
+                    <div>
+                        <label class="field-label">Lesson</label>
+                        <asp:DropDownList
+                            ID="ddlLessons"
+                            runat="server"
+                            AutoPostBack="true"
+                            OnSelectedIndexChanged="ddlLessons_SelectedIndexChanged">
+                        </asp:DropDownList>
+                    </div>
 
-Lesson
+                    <div>
+                        <label class="field-label">Status</label>
+                        <asp:DropDownList
+                            ID="ddlStatus"
+                            runat="server"
+                            AutoPostBack="true"
+                            OnSelectedIndexChanged="ddlStatus_SelectedIndexChanged">
+                            <asp:ListItem Text="All Status" Value=""></asp:ListItem>
+                            <asp:ListItem Text="Completed" Value="Completed"></asp:ListItem>
+                            <asp:ListItem Text="In Progress" Value="In Progress"></asp:ListItem>
+                            <asp:ListItem Text="Not Started" Value="Not Started"></asp:ListItem>
+                        </asp:DropDownList>
+                    </div>
 
-<asp:DropDownList
-ID="ddlLessons"
-runat="server"
-AutoPostBack="true"
-OnSelectedIndexChanged="ddlLessons_SelectedIndexChanged">
-</asp:DropDownList>
+                    <div>
+                        <label class="field-label">Search Student</label>
+                        <asp:TextBox ID="txtSearchStudent" runat="server" placeholder="Enter student name"></asp:TextBox>
+                    </div>
 
-</div>
+                    <div>
+                        <asp:Button ID="btnSearch" runat="server" Text="Search" CssClass="btn" OnClick="btnSearch_Click" />
+                    </div>
 
-<div class="section">
+                    <div>
+                        <asp:Button ID="btnReset" runat="server" Text="Reset" CssClass="btn btn-secondary" OnClick="btnReset_Click" />
+                    </div>
+                </div>
+            </div>
 
-<h3>Participation Records</h3>
+            <div class="section">
+                <h3>Participation Records</h3>
 
-<asp:GridView
-ID="dgvParticipation"
-runat="server"
-CssClass="grid"
-AutoGenerateColumns="false">
+                <asp:GridView
+                    ID="dgvParticipation"
+                    runat="server"
+                    CssClass="grid"
+                    AutoGenerateColumns="false"
+                    OnRowDataBound="dgvParticipation_RowDataBound"
+                    EmptyDataText="No participation records found.">
 
-<Columns>
+                    <Columns>
+                        <asp:BoundField DataField="FullName" HeaderText="Student" />
+                        <asp:BoundField DataField="LevelName" HeaderText="Level" />
+                        <asp:BoundField DataField="LessonTitle" HeaderText="Lesson" />
 
-<asp:BoundField DataField="Fullname" HeaderText="Student"/>
-<asp:BoundField DataField="LevelName" HeaderText="Level"/>
-<asp:BoundField DataField="LessonTitle" HeaderText="Lesson"/>
-<asp:BoundField DataField="CompletionStatus" HeaderText="Status"/>
-<asp:BoundField DataField="CompletionDate" HeaderText="Completed On"/>
+                        <asp:TemplateField HeaderText="Status">
+                            <ItemTemplate>
+                                <asp:Label ID="lblStatus" runat="server" Text='<%# Eval("CompletionStatus") %>'></asp:Label>
+                            </ItemTemplate>
+                        </asp:TemplateField>
 
-</Columns>
+                        <asp:TemplateField HeaderText="Completed On">
+                            <ItemTemplate>
+                                <asp:Label ID="lblCompletedOn" runat="server"></asp:Label>
+                            </ItemTemplate>
+                        </asp:TemplateField>
+                    </Columns>
 
-</asp:GridView>
+                </asp:GridView>
+            </div>
 
-</div>
+        </div>
 
-</div>
-
-</form>
-
+    </form>
 </body>
 </html>

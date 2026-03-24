@@ -42,6 +42,24 @@ namespace MandarinQuest
         protected global::System.Web.UI.WebControls.DropDownList ddlClasses;
 
         /// <summary>
+        /// lblMessage control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblMessage;
+
+        /// <summary>
+        /// hfLessonID control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField hfLessonID;
+
+        /// <summary>
         /// txtLessonTitle control.
         /// </summary>
         /// <remarks>
@@ -67,6 +85,24 @@ namespace MandarinQuest
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Button btnAddLesson;
+
+        /// <summary>
+        /// btnUpdateLesson control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnUpdateLesson;
+
+        /// <summary>
+        /// btnCancelEdit control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnCancelEdit;
 
         /// <summary>
         /// gvLessons control.

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 using System.Data.SqlClient;
 
 namespace MandarinQuest
@@ -12,47 +13,131 @@ namespace MandarinQuest
 
         protected void btnRegisterSubmit_Click(object sender, EventArgs e)
         {
-            con.Open();
-
-            SqlCommand checkEmail = new SqlCommand(
-            "SELECT COUNT(*) FROM Users WHERE Email=@e", con);
-
-            checkEmail.Parameters.AddWithValue("@e", txtRegEmail.Text.Trim().ToLower());
-
-            int exists = (int)checkEmail.ExecuteScalar();
-
-            if (exists > 0)
+            if (!Page.IsValid)
             {
-                Response.Write("<script>alert('Email already exists');</script>");
-                con.Close();
                 return;
             }
 
-            // 1️⃣ Insert user
-            SqlCommand cmdUser = new SqlCommand(
-            "INSERT INTO Users (FullName, Email, PasswordHash) OUTPUT INSERTED.UserID VALUES (@n,@e,@p)", con);
+            string fullName = txtFullName.Text.Trim();
+            string email = txtRegEmail.Text.Trim().ToLower();
+            string password = txtRegPassword.Text.Trim();
 
-            cmdUser.Parameters.AddWithValue("@n", txtFullName.Text);
-            cmdUser.Parameters.AddWithValue("@e", txtRegEmail.Text.Trim().ToLower());
-            cmdUser.Parameters.AddWithValue("@p", txtRegPassword.Text);
+            if (string.IsNullOrWhiteSpace(fullName))
+            {
+                lblMessage.Text = "Full Name cannot be empty.";
+                return;
+            }
 
-            int newUserID = (int)cmdUser.ExecuteScalar();
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                lblMessage.Text = "Email cannot be empty.";
+                return;
+            }
 
-            // 2️⃣ Get Student RoleID
-            SqlCommand cmdRole = new SqlCommand(
-            "SELECT RoleID FROM Roles WHERE RoleName='Student'", con);
+            if (string.IsNullOrWhiteSpace(password))
+            {
+                lblMessage.Text = "Password cannot be empty.";
+                return;
+            }
 
-            int roleID = (int)cmdRole.ExecuteScalar();
+            SqlTransaction trans = null;
 
-            // 3️⃣ Assign role to user
-            SqlCommand cmdUserRole = new SqlCommand(
-            "INSERT INTO UserRoles (UserID, RoleID) VALUES (@uid,@rid)", con);
+            try
+            {
+                con.Open();
+                trans = con.BeginTransaction();
 
-            cmdUserRole.Parameters.AddWithValue("@uid", newUserID);
-            cmdUserRole.Parameters.AddWithValue("@rid", roleID);
-            cmdUserRole.ExecuteNonQuery();
+                SqlCommand checkEmail = new SqlCommand(
+                "SELECT COUNT(*) FROM Users WHERE Email=@e", con, trans);
 
-            con.Close();
+                checkEmail.Parameters.AddWithValue("@e", email);
+
+                int exists = Convert.ToInt32(checkEmail.ExecuteScalar());
+
+                if (exists > 0)
+                {
+                    lblMessage.Text = "Email already exists.";
+                    trans.Rollback();
+                    con.Close();
+                    return;
+                }
+
+                SqlCommand cmdUser = new SqlCommand(
+                "INSERT INTO Users (FullName, Email, PasswordHash) OUTPUT INSERTED.UserID VALUES (@n,@e,@p)", con, trans);
+
+                cmdUser.Parameters.AddWithValue("@n", fullName);
+                cmdUser.Parameters.AddWithValue("@e", email);
+                cmdUser.Parameters.AddWithValue("@p", password);
+
+                int newUserID = Convert.ToInt32(cmdUser.ExecuteScalar());
+
+                SqlCommand cmdRole = new SqlCommand(
+                "SELECT RoleID FROM Roles WHERE RoleName='Student'", con, trans);
+
+                object roleObj = cmdRole.ExecuteScalar();
+
+                if (roleObj == null)
+                {
+                    lblMessage.Text = "Student role not found.";
+                    trans.Rollback();
+                    con.Close();
+                    return;
+                }
+
+                int roleID = Convert.ToInt32(roleObj);
+
+                SqlCommand cmdUserRole = new SqlCommand(
+                "INSERT INTO UserRoles (UserID, RoleID) VALUES (@uid,@rid)", con, trans);
+
+                cmdUserRole.Parameters.AddWithValue("@uid", newUserID);
+                cmdUserRole.Parameters.AddWithValue("@rid", roleID);
+                cmdUserRole.ExecuteNonQuery();
+
+                SqlCommand cmdProgress = new SqlCommand(
+                @"INSERT INTO StudentProgress
+                  (UserID, LessonID, Status, CompletionDate, QuizScore, QuizPassed, LastQuizAttemptDate)
+                  SELECT
+                      @userId,
+                      L.LessonID,
+                      'Not Started',
+                      NULL,
+                      NULL,
+                      0,
+                      NULL
+                  FROM Lessons L
+                  LEFT JOIN StudentProgress SP
+                      ON SP.UserID = @userId
+                     AND SP.LessonID = L.LessonID
+                  WHERE SP.ProgressID IS NULL", con, trans);
+
+                cmdProgress.Parameters.AddWithValue("@userId", newUserID);
+                cmdProgress.ExecuteNonQuery();
+
+                trans.Commit();
+            }
+            catch (Exception ex)
+            {
+                try
+                {
+                    if (trans != null)
+                    {
+                        trans.Rollback();
+                    }
+                }
+                catch
+                {
+                }
+
+                lblMessage.Text = "Error: " + ex.Message;
+                return;
+            }
+            finally
+            {
+                if (con.State == ConnectionState.Open)
+                {
+                    con.Close();
+                }
+            }
 
             Response.Redirect("Login.aspx");
         }

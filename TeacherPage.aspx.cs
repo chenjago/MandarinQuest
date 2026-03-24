@@ -33,7 +33,7 @@ namespace MandarinQuest
         {
             con.Open();
 
-            SqlCommand cmd1 = new SqlCommand("SELECT COUNT(*) FROM Levels", con);
+            SqlCommand cmd1 = new SqlCommand("SELECT COUNT(*) FROM Levels WHERE Status='Active'", con);
             lblClassCount.Text = cmd1.ExecuteScalar().ToString();
 
             SqlCommand cmd2 = new SqlCommand("SELECT COUNT(*) FROM Lessons", con);
@@ -45,8 +45,7 @@ namespace MandarinQuest
                 INNER JOIN UserRoles UR ON U.UserID = UR.UserID
                 INNER JOIN Roles R ON UR.RoleID = R.RoleID
                 WHERE R.RoleName = 'student'
-                ", con);
-
+            ", con);
             lblStudentCount.Text = cmd3.ExecuteScalar().ToString();
 
             con.Close();

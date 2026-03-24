@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="StudentPage.aspx.cs" Inherits="MandarinQuest.StudentPage" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="StudentPage.aspx.cs" Inherits="MandarinQuest.StudentPage" Async="true" %>
 
 <!DOCTYPE html>
 <html>
@@ -189,46 +189,178 @@ color:#777;
 margin-top:10px;
 }
 
-/* CHAT BUTTON */
-
 .chatButton{
-position:fixed;
-bottom:20px;
-right:20px;
-background:#a11212;
-color:white;
-padding:12px 16px;
-border-radius:30px;
-cursor:pointer;
-box-shadow:0 4px 10px rgba(0,0,0,0.3);
+    position:fixed;
+    right:24px;
+    bottom:24px;
+    background:linear-gradient(135deg,#a11212,#d32f2f);
+    color:#fff;
+    padding:14px 20px;
+    border-radius:999px;
+    cursor:pointer;
+    box-shadow:0 10px 25px rgba(161,18,18,0.35);
+    font-weight:600;
+    z-index:999;
+    transition:all 0.25s ease;
 }
 
-/* CHAT PANEL */
+.chatButton:hover{
+    transform:translateY(-2px);
+    box-shadow:0 14px 28px rgba(161,18,18,0.42);
+}
 
 .chatPanel{
-position:fixed;
-bottom:80px;
-right:20px;
-width:320px;
-background:white;
-border-radius:10px;
-box-shadow:0 4px 12px rgba(0,0,0,0.3);
-display:none;
+    position:fixed;
+    right:24px;
+    bottom:84px;
+    width:380px;
+    max-width:calc(100vw - 30px);
+    background:#fff;
+    border-radius:20px;
+    overflow:hidden;
+    box-shadow:0 18px 45px rgba(0,0,0,0.22);
+    display:none;
+    z-index:1000;
+    border:1px solid #f0dede;
 }
 
 .chatHeader{
-background:#a11212;
-color:white;
-padding:10px;
-border-top-left-radius:10px;
-border-top-right-radius:10px;
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:10px;
+    padding:16px 18px;
+    background:linear-gradient(135deg,#a11212,#c62828);
+    color:white;
+}
+
+.chatTitle{
+    font-size:17px;
+    font-weight:700;
+}
+
+.chatSubtitle{
+    font-size:12px;
+    opacity:0.9;
+    margin-top:4px;
+}
+
+.chatClose{
+    background:rgba(255,255,255,0.15);
+    color:white;
+    border:none;
+    width:32px;
+    height:32px;
+    border-radius:50%;
+    cursor:pointer;
+    font-size:14px;
+}
+
+.chatClose:hover{
+    background:rgba(255,255,255,0.25);
 }
 
 .chatBox{
-height:220px;
-overflow-y:auto;
-padding:10px;
-border-bottom:1px solid #ddd;
+    height:340px;
+    overflow-y:auto;
+    padding:16px;
+    background:#fff8f8;
+    border-bottom:1px solid #eee;
+}
+
+.msg{
+    display:flex;
+    margin-bottom:12px;
+}
+
+.msg.user{
+    justify-content:flex-end;
+}
+
+.msg.ai{
+    justify-content:flex-start;
+}
+
+.bubble{
+    max-width:82%;
+    padding:12px 14px;
+    border-radius:16px;
+    line-height:1.5;
+    font-size:14px;
+    box-shadow:0 4px 10px rgba(0,0,0,0.06);
+    word-wrap:break-word;
+}
+
+.userBubble{
+    background:#a11212;
+    color:white;
+    border-bottom-right-radius:6px;
+}
+
+.aiBubble{
+    background:white;
+    color:#333;
+    border:1px solid #f1d4d4;
+    border-bottom-left-radius:6px;
+}
+
+.chatInputArea{
+    display:flex;
+    gap:10px;
+    padding:14px;
+    background:white;
+    align-items:flex-end;
+}
+
+.chatInput{
+    flex:1;
+    resize:none;
+    padding:12px 14px;
+    border:1px solid #e3c8c8;
+    border-radius:14px;
+    font-family:'Segoe UI';
+    font-size:14px;
+    outline:none;
+    min-height:46px;
+    box-sizing:border-box;
+}
+
+.chatInput:focus{
+    border-color:#c62828;
+    box-shadow:0 0 0 3px rgba(198,40,40,0.10);
+}
+
+.chatSendBtn{
+    background:linear-gradient(135deg,#a11212,#d32f2f);
+    color:white;
+    border:none;
+    border-radius:14px;
+    padding:12px 18px;
+    cursor:pointer;
+    font-weight:600;
+    min-width:82px;
+}
+
+.chatSendBtn:hover{
+    filter:brightness(1.05);
+}
+
+@media (max-width: 600px){
+    .chatPanel{
+        right:10px;
+        left:10px;
+        width:auto;
+        bottom:78px;
+    }
+
+    .chatButton{
+        right:12px;
+        bottom:12px;
+    }
+
+    .chatBox{
+        height:300px;
+    }
 }
 
 /* CUSTOMER SERVICE BUTTON */
@@ -263,9 +395,7 @@ padding:15px;
 </style>
 
 <script>
-
     function toggleChat() {
-
         var panel = document.getElementById("chatPanel");
 
         if (panel.style.display == "none" || panel.style.display == "")
@@ -274,8 +404,11 @@ padding:15px;
             panel.style.display = "none";
     }
 
-    function toggleCS() {
+    function openChat() {
+        document.getElementById("chatPanel").style.display = "block";
+    }
 
+    function toggleCS() {
         var panel = document.getElementById("csPanel");
 
         if (panel.style.display == "none" || panel.style.display == "")
@@ -283,7 +416,6 @@ padding:15px;
         else
             panel.style.display = "none";
     }
-
 </script>
 
 </head>
@@ -408,34 +540,53 @@ Visible="false"/>
 <!-- AI CHAT -->
 
 <div class="chatButton" onclick="toggleChat()">
-AI Tutor
+    💬 AI Tutor
 </div>
 
 <div class="chatPanel" id="chatPanel">
+    <div class="chatHeader">
+        <div>
+            <div class="chatTitle">AI Mandarin Tutor</div>
+            <div class="chatSubtitle">Ask words, pinyin, grammar, and examples</div>
+        </div>
+        <button type="button" class="chatClose" onclick="toggleChat()">✕</button>
+    </div>
 
-<div class="chatHeader">
-AI Mandarin Tutor
+    <div class="chatBox" id="chatBox">
+        <asp:Literal ID="litChatHistory" runat="server"></asp:Literal>
+
+        <asp:Panel ID="pnlWelcome" runat="server">
+            <div class="msg ai">
+                <div class="bubble aiBubble">
+                    你好! I’m your Mandarin tutor. Try asking:
+                    <br /><br />
+                    • How do I say “good morning” in Mandarin?
+                    <br />
+                    • Give me 3 beginner Mandarin phrases
+                    <br />
+                    • Explain “xie xie” with pinyin
+                </div>
+            </div>
+        </asp:Panel>
+    </div>
+
+    <div class="chatInputArea">
+        <asp:TextBox
+            ID="txtQuestion"
+            runat="server"
+            CssClass="chatInput"
+            TextMode="MultiLine"
+            Rows="2"
+            placeholder="Type your question here..."></asp:TextBox>
+
+        <asp:Button
+            ID="btnAskAI"
+            runat="server"
+            Text="Send"
+            CssClass="chatSendBtn"
+            OnClick="btnAskAI_Click" />
+    </div>
 </div>
-
-<div class="chatBox">
-<asp:Literal ID="litChatHistory" runat="server"></asp:Literal>
-</div>
-
-<div style="padding:10px;">
-
-<asp:TextBox ID="txtQuestion" runat="server" Width="70%"></asp:TextBox>
-
-<asp:Button
-ID="btnAskAI"
-runat="server"
-Text="Send"
-CssClass="levelBtn"
-OnClick="btnAskAI_Click"/>
-
-</div>
-
-</div>
-
 
 <!-- CUSTOMER SERVICE -->
 
