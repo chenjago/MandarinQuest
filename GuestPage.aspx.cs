@@ -4,7 +4,6 @@ namespace MandarinQuest
 {
     public partial class GuestPage : System.Web.UI.Page
     {
-
         protected void btnLogin_Click(object sender, EventArgs e)
         {
             Response.Redirect("Login.aspx");
@@ -15,5 +14,9 @@ namespace MandarinQuest
             Response.Redirect("Register.aspx");
         }
 
+        protected void btnMaterialsCard_Click(object sender, EventArgs e)
+        {
+            Response.Redirect("LearningMaterials.aspx");
+        }
     }
 }

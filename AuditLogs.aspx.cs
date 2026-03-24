@@ -1,10 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using System.Web.UI.WebControls;
 
 namespace MandarinQuest
 {
     public partial class AuditLogs : System.Web.UI.Page
     {
+        string connStr = @"Data Source=(LocalDB)\MSSQLLocalDB;
+                           AttachDbFilename=|DataDirectory|\MandarinQuest.mdf;
+                           Integrated Security=True;Connect Timeout=30";
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -14,34 +19,54 @@ namespace MandarinQuest
             }
         }
 
-        void LoadLogs()
+        private void LoadLogs()
         {
-
-            List<string> logs;
-
-            if (Session["Logs"] == null)
+            using (SqlConnection conn = new SqlConnection(connStr))
             {
-                logs = new List<string>();
+                try
+                {
+                    conn.Open();
 
-                logs.Add("Admin logged into system");
-                logs.Add("User Alice account updated");
-                logs.Add("User John account disabled");
-                logs.Add("Roles updated");
+                    string query = @"SELECT UserID, Action, Description, LogDate
+                                     FROM AuditLogs 
+                                     ORDER BY LogDate DESC";
 
-                Session["Logs"] = logs;
+                    SqlDataAdapter da = new SqlDataAdapter(query, conn);
+                    DataTable dt = new DataTable();
+                    da.Fill(dt);
+
+                    gvAuditLogs.DataSource = dt;
+                    gvAuditLogs.DataBind();
+                }
+                catch (Exception ex)
+                {
+                    Response.Write("Error: " + ex.Message);
+                }
             }
-
-            logs = (List<string>)Session["Logs"];
-
-            string output = "";
-
-            foreach (string log in logs)
-            {
-                output += "<div class='log'>" + log + "</div>";
-            }
-
-            litLogs.Text = output;
         }
 
+        protected void btnBack_Click(object sender, EventArgs e)
+        {
+            Response.Redirect("AdminPage.aspx");
+        }
+
+        protected void gvAuditLogs_PageIndexChanging(object sender, GridViewPageEventArgs e)
+        {
+            gvAuditLogs.PageIndex = e.NewPageIndex;
+            LoadLogs();
+        }
+
+        protected void gvAuditLogs_RowDataBound(object sender, GridViewRowEventArgs e)
+        {
+            if (e.Row.RowType == DataControlRowType.DataRow)
+            {
+                string action = e.Row.Cells[1].Text;
+
+                if (action == "Delete" || action == "PasswordReset")
+                {
+                    e.Row.BackColor = System.Drawing.Color.FromArgb(255, 230, 230); // light red
+                }
+            }
+        }
     }
 }

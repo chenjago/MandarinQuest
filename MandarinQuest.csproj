@@ -139,7 +139,6 @@
     <Content Include="ManageLevels.aspx" />
     <Content Include="AdminViewClasses.aspx" />
     <Content Include="ManageLessons.aspx" />
-    <Content Include="ManageRoles.aspx" />
     <Content Include="ManageUsers.aspx" />
     <Content Include="MyClasses.aspx" />
     <Content Include="Profile.aspx" />
@@ -177,6 +176,7 @@
     <Content Include="Content\bootstrap-grid.rtl.css.map" />
     <Content Include="Content\bootstrap-grid.min.css.map" />
     <Content Include="Content\bootstrap-grid.css.map" />
+    <Content Include="CreateUsers.aspx" />
     <None Include="Scripts\jquery-3.7.0.intellisense.js" />
     <Content Include="Scripts\jquery-3.7.0.js" />
     <Content Include="Scripts\jquery-3.7.0.min.js" />
@@ -341,13 +341,6 @@
     <Compile Include="ManageLessons.aspx.designer.cs">
       <DependentUpon>ManageLessons.aspx</DependentUpon>
     </Compile>
-    <Compile Include="ManageRoles.aspx.cs">
-      <DependentUpon>ManageRoles.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="ManageRoles.aspx.designer.cs">
-      <DependentUpon>ManageRoles.aspx</DependentUpon>
-    </Compile>
     <Compile Include="ManageUsers.aspx.cs">
       <DependentUpon>ManageUsers.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -467,6 +460,13 @@
     </Compile>
     <Compile Include="ViewSwitcher.ascx.designer.cs">
       <DependentUpon>ViewSwitcher.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="CreateUsers.aspx.cs">
+      <DependentUpon>CreateUsers.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="CreateUsers.aspx.designer.cs">
+      <DependentUpon>CreateUsers.aspx</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup />
