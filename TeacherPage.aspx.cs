@@ -62,10 +62,7 @@ namespace MandarinQuest
                 INNER JOIN Roles R ON UR.RoleID = R.RoleID
                 WHERE R.RoleName = 'student'
             ", con);
-<<<<<<< HEAD
-=======
 
->>>>>>> origin/sean
             lblStudentCount.Text = cmd3.ExecuteScalar().ToString();
 
             con.Close();
