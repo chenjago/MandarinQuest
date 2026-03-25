@@ -167,20 +167,46 @@
             <asp:GridView ID="gvRegistrations" runat="server" AutoGenerateColumns="false" CssClass="table">
                 <Columns>
                     <asp:BoundField DataField="Month" HeaderText="Month" />
-                    <asp:BoundField DataField="Count" HeaderText="New Students Registered" />
+                    <asp:BoundField DataField="Count" HeaderText="New User Registered" />
+                </Columns>
+            </asp:GridView>
+
+            <h1>Student Progress</h1>
+
+            <asp:GridView 
+                ID="gvStudentProgress" 
+                runat="server" 
+                AutoGenerateColumns="False" 
+                CssClass="report-table"
+                GridLines="None">
+                <Columns>
+                    <asp:BoundField DataField="StudentName" HeaderText="Student Name" />
+                    <asp:BoundField DataField="CompletedLessons" HeaderText="Completed Lessons" />
+                    <asp:BoundField DataField="InProgressLessons" HeaderText="Lessons In Progress" />
+                    <asp:BoundField DataField="TotalLessons" HeaderText="Total Lessons" />
+                    <asp:TemplateField HeaderText="Overall Progress %">
+                        <ItemTemplate>
+                            <div class="progress-bar">
+                                <div class="progress" style='<%# "width:" + String.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.##}", Eval("Percentage")) + "%;" %>'>
+                                    <%# String.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.##}", Eval("Percentage")) %>%
+                                </div>
+                            </div>
+                        </ItemTemplate>
+                    </asp:TemplateField>
                 </Columns>
             </asp:GridView>
 
             <h2>Course Progress</h2>
             <asp:GridView ID="gvCourseProgress" runat="server" AutoGenerateColumns="false" CssClass="table">
                 <Columns>
-                    <asp:BoundField DataField="Lesson" HeaderText="Lesson" />
+                    <asp:BoundField DataField="LessonTitle" HeaderText="Lesson" />
                     <asp:BoundField DataField="StudentsCompleted" HeaderText="Students Completed" />
-                    <asp:TemplateField HeaderText="Progress">
+                    <asp:BoundField DataField="StudentsInProgress" HeaderText="Students In Progress" />
+                    <asp:TemplateField HeaderText="Completion %">
                         <ItemTemplate>
                             <div class="progress-bar">
-                                <div class="progress" style='width:<%# Eval("Percentage") %>%'>
-                                    <%# Eval("Percentage") %>%
+                                <div class="progress" style='<%# "width:" + String.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.##}", Eval("Percentage") == DBNull.Value ? 0 : Eval("Percentage")) + "%;" %>'>
+                                    <%# String.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.##}", Eval("Percentage") == DBNull.Value ? 0 : Eval("Percentage")) %>%
                                 </div>
                             </div>
                         </ItemTemplate>

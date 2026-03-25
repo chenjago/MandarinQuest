@@ -17,6 +17,7 @@ namespace MandarinQuest
             {
                 LoadStats();
                 LoadRegistrations();
+                LoadStudentProgress();
                 LoadCourseProgress();
             }
         }
@@ -33,10 +34,12 @@ namespace MandarinQuest
                 "SELECT COUNT(DISTINCT UserID) FROM UserRoles WHERE RoleID = 2", con);
             lblStudents.Text = cmdStudents.ExecuteScalar().ToString();
 
-            SqlCommand cmdLessons = new SqlCommand("SELECT COUNT(*) FROM Lessons", con);
+            SqlCommand cmdLessons = new SqlCommand(
+                "SELECT COUNT(*) FROM Lessons", con);
             lblLessons.Text = cmdLessons.ExecuteScalar().ToString();
 
-            SqlCommand cmdMaterials = new SqlCommand("SELECT COUNT(*) FROM LearningMaterials", con);
+            SqlCommand cmdMaterials = new SqlCommand(
+                "SELECT COUNT(*) FROM LearningMaterials", con);
             lblMaterials.Text = cmdMaterials.ExecuteScalar().ToString();
 
             con.Close();
@@ -44,7 +47,6 @@ namespace MandarinQuest
 
         void LoadRegistrations()
         {
-            con.Open();
             SqlDataAdapter da = new SqlDataAdapter(
                 @"SELECT DATENAME(MONTH, CreatedDate) + ' ' + CAST(YEAR(CreatedDate) AS VARCHAR) AS Month,
                          COUNT(UserID) AS Count
@@ -54,28 +56,61 @@ namespace MandarinQuest
 
             DataTable dt = new DataTable();
             da.Fill(dt);
+
             gvRegistrations.DataSource = dt;
             gvRegistrations.DataBind();
-            con.Close();
         }
-        void LoadCourseProgress()
+
+        void LoadStudentProgress()
         {
-            con.Open();
             SqlDataAdapter da = new SqlDataAdapter(
-                @"SELECT sp.LessonID AS Lesson,
-                 COUNT(sp.UserID) AS StudentsCompleted,
-                 (COUNT(sp.UserID) * 100.0 / 
-                    (SELECT COUNT(*) FROM UserRoles WHERE RoleID = 2)) AS Percentage
-          FROM StudentProgress sp
-          WHERE sp.Status = 'Completed'
-          GROUP BY sp.LessonID
-          ORDER BY sp.LessonID", con);
+                @"SELECT 
+                U.FullName AS StudentName,
+                ISNULL(SUM(CASE WHEN SP.Status = 'Completed' THEN 1 ELSE 0 END), 0) AS CompletedLessons,
+                ISNULL(SUM(CASE WHEN SP.Status = 'In Progress' THEN 1 ELSE 0 END), 0) AS InProgressLessons,
+                (SELECT COUNT(*) FROM Lessons) AS TotalLessons,
+                CAST(
+                    ISNULL(SUM(CASE WHEN SP.Status = 'Completed' THEN 1 ELSE 0 END), 0) * 100.0 /
+                    NULLIF((SELECT COUNT(*) FROM Lessons), 0)
+                AS DECIMAL(5,2)) AS Percentage
+              FROM Users U
+              INNER JOIN UserRoles UR ON U.UserID = UR.UserID
+              LEFT JOIN StudentProgress SP ON U.UserID = SP.UserID
+              WHERE UR.RoleID = 2
+              GROUP BY U.UserID, U.FullName
+              ORDER BY U.FullName", 
+              con);
 
             DataTable dt = new DataTable();
             da.Fill(dt);
+
+            gvStudentProgress.DataSource = dt;
+            gvStudentProgress.DataBind();
+        }
+
+        void LoadCourseProgress()
+        {
+            SqlDataAdapter da = new SqlDataAdapter(
+                @"SELECT 
+            L.LessonTitle,
+            COUNT(DISTINCT CASE WHEN SP.Status = 'Completed' THEN SP.UserID END) AS StudentsCompleted,
+            COUNT(DISTINCT CASE WHEN SP.Status = 'In Progress' THEN SP.UserID END) AS StudentsInProgress,
+            ISNULL(
+                CAST(
+                    COUNT(DISTINCT CASE WHEN SP.Status = 'Completed' THEN SP.UserID END) * 100.0 /
+                    NULLIF((SELECT COUNT(DISTINCT UserID) FROM UserRoles WHERE RoleID = 2), 0)
+                AS DECIMAL(5,2)),
+            0) AS Percentage
+          FROM Lessons L
+          LEFT JOIN StudentProgress SP ON L.LessonID = SP.LessonID
+          GROUP BY L.LessonID, L.LessonTitle
+          ORDER BY L.LessonID", con);
+
+            DataTable dt = new DataTable();
+            da.Fill(dt);
+
             gvCourseProgress.DataSource = dt;
             gvCourseProgress.DataBind();
-            con.Close();
         }
 
         protected void btnBack_Click(object sender, EventArgs e)
