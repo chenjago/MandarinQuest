@@ -118,64 +118,56 @@
                 </asp:DropDownList>
             </div>
 
-            <asp:GridView
-                ID="gvUsers"
-                runat="server"
-                AutoGenerateColumns="False"
-                DataKeyNames="UserID"
+            <div style="margin-bottom:20px;">
+                <asp:DropDownList ID="DropDownList1" runat="server" AutoPostBack="true"
+                    OnSelectedIndexChanged="ddlFilterRole_SelectedIndexChanged">
+                </asp:DropDownList>
+
+                <asp:TextBox ID="txtSearch" runat="server" placeholder="Search name or email"></asp:TextBox>
+
+                <asp:Button ID="btnSearch" runat="server" Text="Search" OnClick="btnSearch_Click" />
+                <asp:Button ID="btnReset" runat="server" Text="Reset" OnClick="btnReset_Click" />
+            </div>
+
+           <asp:GridView ID="gvUsers" runat="server" AutoGenerateColumns="False" DataKeyNames="UserID"
                 OnRowEditing="gvUsers_RowEditing"
-                OnRowUpdating="gvUsers_RowUpdating"
                 OnRowCancelingEdit="gvUsers_RowCancelingEdit"
+                OnRowUpdating="gvUsers_RowUpdating"
                 OnRowDeleting="gvUsers_RowDeleting">
 
                 <Columns>
-
-                    <asp:BoundField DataField="UserID" HeaderText="User ID" ReadOnly="True" ItemStyle-Width="10%" />
-
-                    <asp:TemplateField HeaderText="Full Name" ItemStyle-Width="20%">
+                    <asp:BoundField DataField="UserID" HeaderText="User ID" ReadOnly="True" />
+                    <asp:TemplateField HeaderText="Full Name">
                         <ItemTemplate>
                             <%# Eval("FullName") %>
                         </ItemTemplate>
                         <EditItemTemplate>
-                            <asp:TextBox ID="txtFullName" runat="server"
-                                Text='<%# Bind("FullName") %>' />
+                            <asp:TextBox ID="txtFullName" runat="server" Text='<%# Bind("FullName") %>'></asp:TextBox>
                         </EditItemTemplate>
                     </asp:TemplateField>
 
-                    <asp:TemplateField HeaderText="Email" ItemStyle-Width="25%">
+                    <asp:TemplateField HeaderText="Email">
                         <ItemTemplate>
                             <%# Eval("Email") %>
                         </ItemTemplate>
                         <EditItemTemplate>
-                            <asp:TextBox ID="txtEmail" runat="server"
-                                Text='<%# Bind("Email") %>' />
+                            <asp:TextBox ID="txtEmail" runat="server" Text='<%# Bind("Email") %>'></asp:TextBox>
                         </EditItemTemplate>
                     </asp:TemplateField>
 
-                    <asp:BoundField DataField="CreatedDate" HeaderText="Created Date" ReadOnly="True" ItemStyle-Width="20%" />
+                    <asp:BoundField DataField="RoleName" HeaderText="Role" ReadOnly="True" />
 
-                    <asp:TemplateField HeaderText="Role" ItemStyle-Width="15%">
+                    <asp:TemplateField HeaderText="New Password">
                         <ItemTemplate>
-                            <asp:Label ID="lblRole" runat="server" Text='<%# Eval("RoleName") %>'></asp:Label>
+                            ****** 
                         </ItemTemplate>
                         <EditItemTemplate>
-                            <asp:DropDownList ID="ddlRoles" runat="server" Enabled="False" />
+                            <asp:TextBox ID="txtPassword" runat="server" TextMode="Password"></asp:TextBox>
                         </EditItemTemplate>
                     </asp:TemplateField>
 
-                    <asp:TemplateField HeaderText="Password" ItemStyle-Width="10%">
-                        <ItemTemplate>
-                            *****
-                        </ItemTemplate>
-                        <EditItemTemplate>
-                            <asp:TextBox ID="txtPassword" runat="server" TextMode="Password" />
-                        </EditItemTemplate>
-                    </asp:TemplateField>
-
-                    <asp:CommandField ShowEditButton="True" ShowDeleteButton="True" ItemStyle-Width="10%" />
-
+                    <asp:CommandField ShowEditButton="True" ShowDeleteButton="True" />
                 </Columns>
-
             </asp:GridView>
 
         </div>

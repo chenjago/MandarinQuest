@@ -86,41 +86,42 @@
             transform: translateY(-2px);
         }
 
-        table {
+        .table,
+        .report-table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
+            background: #fff;
         }
 
-        table, th, td {
+        .table th, .table td,
+        .report-table th, .report-table td {
             border: 1px solid #ddd;
-        }
-
-        th, td {
             padding: 10px;
             text-align: center;
         }
 
-        th {
+        .table th,
+        .report-table th {
             background-color: #dc2626;
             color: white;
         }
 
         .progress-bar {
-            height: 18px;
+            height: 20px;
             background-color: #f3f3f3;
-            border-radius: 8px;
+            border-radius: 10px;
             overflow: hidden;
         }
 
-        .progress {
+        .progress-fill {
             height: 100%;
             background-color: #dc2626;
-            text-align: right;
-            padding-right: 5px;
             color: white;
-            font-size: 0.8rem;
-            line-height: 18px;
+            font-size: 12px;
+            line-height: 20px;
+            text-align: center;
+            white-space: nowrap;
         }
 
         @media (max-width: 768px) {
@@ -134,12 +135,15 @@
 <body>
     <form id="form1" runat="server">
         <div class="container">
+
             <h1>View Reports</h1>
 
-            <asp:Button ID="btnBack" runat="server"
-                        Text="← Back to Admin"
-                        CssClass="btn"
-                        OnClick="btnBack_Click" />
+            <asp:Button
+                ID="btnBack"
+                runat="server"
+                Text="← Back to Admin"
+                CssClass="btn"
+                OnClick="btnBack_Click" />
 
             <div class="cards">
                 <div class="card">
@@ -164,51 +168,66 @@
             </div>
 
             <h2>New Registrations (Monthly)</h2>
-            <asp:GridView ID="gvRegistrations" runat="server" AutoGenerateColumns="false" CssClass="table">
+            <asp:GridView
+                ID="gvRegistrations"
+                runat="server"
+                AutoGenerateColumns="False"
+                CssClass="table"
+                GridLines="None">
                 <Columns>
                     <asp:BoundField DataField="Month" HeaderText="Month" />
-                    <asp:BoundField DataField="Count" HeaderText="New User Registered" />
+                    <asp:BoundField DataField="Count" HeaderText="New Students Registered" />
                 </Columns>
             </asp:GridView>
 
-            <h1>Student Progress</h1>
-
-            <asp:GridView 
-                ID="gvStudentProgress" 
-                runat="server" 
-                AutoGenerateColumns="False" 
+            <h2>Student Progress</h2>
+            <asp:GridView
+                ID="gvStudentProgress"
+                runat="server"
+                AutoGenerateColumns="False"
                 CssClass="report-table"
-                GridLines="None">
+                GridLines="None"
+                OnRowDataBound="gvStudentProgress_RowDataBound">
                 <Columns>
                     <asp:BoundField DataField="StudentName" HeaderText="Student Name" />
                     <asp:BoundField DataField="CompletedLessons" HeaderText="Completed Lessons" />
                     <asp:BoundField DataField="InProgressLessons" HeaderText="Lessons In Progress" />
                     <asp:BoundField DataField="TotalLessons" HeaderText="Total Lessons" />
+
                     <asp:TemplateField HeaderText="Overall Progress %">
                         <ItemTemplate>
                             <div class="progress-bar">
-                                <div class="progress" style='<%# "width:" + String.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.##}", Eval("Percentage")) + "%;" %>'>
-                                    <%# String.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.##}", Eval("Percentage")) %>%
-                                </div>
+                                <asp:Panel ID="pnlStudentProgress" runat="server" CssClass="progress-fill">
+                                    <asp:Label ID="lblStudentProgressText" runat="server"></asp:Label>
+                                </asp:Panel>
                             </div>
+                            <asp:HiddenField ID="hfStudentPercentage" runat="server" Value='<%# Eval("Percentage") %>' />
                         </ItemTemplate>
                     </asp:TemplateField>
                 </Columns>
             </asp:GridView>
 
             <h2>Course Progress</h2>
-            <asp:GridView ID="gvCourseProgress" runat="server" AutoGenerateColumns="false" CssClass="table">
+            <asp:GridView
+                ID="gvCourseProgress"
+                runat="server"
+                AutoGenerateColumns="False"
+                CssClass="table"
+                GridLines="None"
+                OnRowDataBound="gvCourseProgress_RowDataBound">
                 <Columns>
                     <asp:BoundField DataField="LessonTitle" HeaderText="Lesson" />
                     <asp:BoundField DataField="StudentsCompleted" HeaderText="Students Completed" />
                     <asp:BoundField DataField="StudentsInProgress" HeaderText="Students In Progress" />
+
                     <asp:TemplateField HeaderText="Completion %">
                         <ItemTemplate>
                             <div class="progress-bar">
-                                <div class="progress" style='<%# "width:" + String.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.##}", Eval("Percentage") == DBNull.Value ? 0 : Eval("Percentage")) + "%;" %>'>
-                                    <%# String.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.##}", Eval("Percentage") == DBNull.Value ? 0 : Eval("Percentage")) %>%
-                                </div>
+                                <asp:Panel ID="pnlCourseProgress" runat="server" CssClass="progress-fill">
+                                    <asp:Label ID="lblCourseProgressText" runat="server"></asp:Label>
+                                </asp:Panel>
                             </div>
+                            <asp:HiddenField ID="hfCoursePercentage" runat="server" Value='<%# Eval("Percentage") %>' />
                         </ItemTemplate>
                     </asp:TemplateField>
                 </Columns>

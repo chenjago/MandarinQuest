@@ -8,63 +8,70 @@ namespace MandarinQuest
     {
         protected void btnLoginSubmit_Click(object sender, EventArgs e)
         {
-            // 1️⃣ Get connection string from web.config
+            string email = txtEmail.Text.Trim().ToLower();
+            string password = txtPassword.Text.Trim();
+
+            if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+            {
+                Response.Write("<script>alert('Please enter email and password');</script>");
+                return;
+            }
+
             string cs = ConfigurationManager
                         .ConnectionStrings["MandarinQuestDB"]
                         .ConnectionString;
 
             using (SqlConnection con = new SqlConnection(cs))
             {
-                // 2️⃣ SQL with role join + safe email matching
                 string query = @"
-                    SELECT U.UserID, R.RoleName
+                    SELECT U.UserID, U.PasswordHash, R.RoleName
                     FROM Users U
                     INNER JOIN UserRoles UR ON U.UserID = UR.UserID
                     INNER JOIN Roles R ON UR.RoleID = R.RoleID
-                    WHERE LOWER(U.Email) = @email
-                      AND U.PasswordHash = @password";
+                    WHERE LOWER(U.Email) = @email";
 
                 SqlCommand cmd = new SqlCommand(query, con);
-
-                // 3️⃣ Normalize input
-                cmd.Parameters.AddWithValue("@email",
-                    txtEmail.Text.Trim().ToLower());
-
-                cmd.Parameters.AddWithValue("@password",
-                    txtPassword.Text.Trim());
+                cmd.Parameters.AddWithValue("@email", email);
 
                 con.Open();
 
-                SqlDataReader reader = cmd.ExecuteReader();
-
-                // 4️⃣ Login success
-                if (reader.Read())
+                using (SqlDataReader reader = cmd.ExecuteReader())
                 {
-                    Session["UserID"] = reader["UserID"].ToString();
-                    Session["Role"] = reader["RoleName"].ToString();
-
-                    string role = reader["RoleName"].ToString();
-
-                    // 5️⃣ Role-based redirect
-                    switch (role)
+                    if (reader.Read())
                     {
-                        case "admin":
-                            Response.Redirect("AdminPage.aspx");
-                            break;
+                        string storedHash = reader["PasswordHash"].ToString();
 
-                        case "teacher":
-                            Response.Redirect("TeacherPage.aspx");
-                            break;
+                        if (PasswordHelper.VerifyPassword(password, storedHash))
+                        {
+                            Session["UserID"] = reader["UserID"].ToString();
+                            Session["Role"] = reader["RoleName"].ToString();
 
-                        default:
-                            Response.Redirect("StudentPage.aspx");
-                            break;
+                            string role = reader["RoleName"].ToString().ToLower();
+
+                            switch (role)
+                            {
+                                case "admin":
+                                    Response.Redirect("AdminPage.aspx");
+                                    break;
+
+                                case "teacher":
+                                    Response.Redirect("TeacherPage.aspx");
+                                    break;
+
+                                default:
+                                    Response.Redirect("StudentPage.aspx");
+                                    break;
+                            }
+                        }
+                        else
+                        {
+                            Response.Write("<script>alert('Invalid email or password');</script>");
+                        }
                     }
-                }
-                else
-                {
-                    // 6️⃣ Login failed
-                    Response.Write("<script>alert('Invalid email or password');</script>");
+                    else
+                    {
+                        Response.Write("<script>alert('Invalid email or password');</script>");
+                    }
                 }
             }
         }

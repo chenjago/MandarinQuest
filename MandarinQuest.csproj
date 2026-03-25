@@ -325,6 +325,7 @@
     <Compile Include="GuestPage.aspx.designer.cs">
       <DependentUpon>GuestPage.aspx</DependentUpon>
     </Compile>
+    <Compile Include="PasswordHelper.cs" />
     <Compile Include="LearningMaterials.aspx.cs">
       <DependentUpon>LearningMaterials.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>

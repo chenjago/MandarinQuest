@@ -40,6 +40,14 @@ namespace MandarinQuest
                 return;
             }
 
+            if (password.Length < 6)
+            {
+                lblMessage.Text = "Password must be at least 6 characters.";
+                return;
+            }
+
+            string hashedPassword = PasswordHelper.HashPassword(password);
+
             SqlTransaction trans = null;
 
             try
@@ -48,7 +56,7 @@ namespace MandarinQuest
                 trans = con.BeginTransaction();
 
                 SqlCommand checkEmail = new SqlCommand(
-                "SELECT COUNT(*) FROM Users WHERE Email=@e", con, trans);
+                "SELECT COUNT(*) FROM Users WHERE Email = @e", con, trans);
 
                 checkEmail.Parameters.AddWithValue("@e", email);
 
@@ -58,21 +66,22 @@ namespace MandarinQuest
                 {
                     lblMessage.Text = "Email already exists.";
                     trans.Rollback();
-                    con.Close();
                     return;
                 }
 
                 SqlCommand cmdUser = new SqlCommand(
-                "INSERT INTO Users (FullName, Email, PasswordHash) OUTPUT INSERTED.UserID VALUES (@n,@e,@p)", con, trans);
+                @"INSERT INTO Users (FullName, Email, PasswordHash)
+                  OUTPUT INSERTED.UserID
+                  VALUES (@n, @e, @p)", con, trans);
 
                 cmdUser.Parameters.AddWithValue("@n", fullName);
                 cmdUser.Parameters.AddWithValue("@e", email);
-                cmdUser.Parameters.AddWithValue("@p", password);
+                cmdUser.Parameters.AddWithValue("@p", hashedPassword);
 
                 int newUserID = Convert.ToInt32(cmdUser.ExecuteScalar());
 
                 SqlCommand cmdRole = new SqlCommand(
-                "SELECT RoleID FROM Roles WHERE RoleName='Student'", con, trans);
+                "SELECT RoleID FROM Roles WHERE RoleName = 'Student'", con, trans);
 
                 object roleObj = cmdRole.ExecuteScalar();
 
@@ -80,14 +89,13 @@ namespace MandarinQuest
                 {
                     lblMessage.Text = "Student role not found.";
                     trans.Rollback();
-                    con.Close();
                     return;
                 }
 
                 int roleID = Convert.ToInt32(roleObj);
 
                 SqlCommand cmdUserRole = new SqlCommand(
-                "INSERT INTO UserRoles (UserID, RoleID) VALUES (@uid,@rid)", con, trans);
+                "INSERT INTO UserRoles (UserID, RoleID) VALUES (@uid, @rid)", con, trans);
 
                 cmdUserRole.Parameters.AddWithValue("@uid", newUserID);
                 cmdUserRole.Parameters.AddWithValue("@rid", roleID);
@@ -114,6 +122,7 @@ namespace MandarinQuest
                 cmdProgress.ExecuteNonQuery();
 
                 trans.Commit();
+                Response.Redirect("Login.aspx");
             }
             catch (Exception ex)
             {
@@ -129,7 +138,6 @@ namespace MandarinQuest
                 }
 
                 lblMessage.Text = "Error: " + ex.Message;
-                return;
             }
             finally
             {
@@ -138,8 +146,6 @@ namespace MandarinQuest
                     con.Close();
                 }
             }
-
-            Response.Redirect("Login.aspx");
         }
 
         protected void btnBackLogin_Click(object sender, EventArgs e)
